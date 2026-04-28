@@ -17,7 +17,18 @@ const triggerCharacters = [
   ),
 ];
 
-function getClassAttributeValue(
+function findLastMatch(text: string, pattern: RegExp) {
+  let lastMatch: RegExpExecArray | undefined;
+  let match: RegExpExecArray | null;
+
+  while ((match = pattern.exec(text)) !== null) {
+    lastMatch = match;
+  }
+
+  return lastMatch;
+}
+
+function getClassExpression(
   document: vscode.TextDocument,
   position: vscode.Position,
 ) {
@@ -26,30 +37,63 @@ function getClassAttributeValue(
   const textBeforeCursor = documentText.slice(0, cursorOffset);
 
   const doubleQuoteMatch = textBeforeCursor.match(
-    /(?:class|className)\s*=\s*"([^"]*)$/,
+    /(?:class|:class|v-bind:class|className)\s*=\s*"([^"]*)$/,
   );
   const singleQuoteMatch = textBeforeCursor.match(
-    /(?:class|className)\s*=\s*'([^']*)$/,
+    /(?:class|:class|v-bind:class|className)\s*=\s*'([^']*)$/,
   );
   const match = doubleQuoteMatch ?? singleQuoteMatch;
 
-  if (!match) {
+  if (match) {
+    const quote = doubleQuoteMatch ? '"' : "'";
+    const textAfterCursor = documentText.slice(cursorOffset);
+    const closingQuoteIndex = textAfterCursor.indexOf(quote);
+    const valueAfterCursor =
+      closingQuoteIndex === -1
+        ? textAfterCursor
+        : textAfterCursor.slice(0, closingQuoteIndex);
+
+    return `${match[1]}${valueAfterCursor}`;
+  }
+
+  const bindingStartMatch = findLastMatch(
+    textBeforeCursor,
+    /(?::class|v-bind:class)\s*=\s*\{/g,
+  );
+
+  if (!bindingStartMatch || bindingStartMatch.index === undefined) {
     return undefined;
   }
 
-  const quote = doubleQuoteMatch ? '"' : "'";
+  const expressionStart = bindingStartMatch.index + bindingStartMatch[0].length;
   const textAfterCursor = documentText.slice(cursorOffset);
-  const closingQuoteIndex = textAfterCursor.indexOf(quote);
-  const valueAfterCursor =
-    closingQuoteIndex === -1
+  const expressionBeforeCursor = documentText.slice(
+    expressionStart,
+    cursorOffset,
+  );
+  const closingBraceIndex = textAfterCursor.indexOf("}");
+  const expressionAfterCursor =
+    closingBraceIndex === -1
       ? textAfterCursor
-      : textAfterCursor.slice(0, closingQuoteIndex);
+      : textAfterCursor.slice(0, closingBraceIndex);
 
-  return `${match[1]}${valueAfterCursor}`;
+  return `${expressionBeforeCursor}${expressionAfterCursor}`;
 }
 
-function getUsedClasses(classAttributeValue: string) {
-  return new Set(classAttributeValue.trim().split(/\s+/).filter(Boolean));
+function getUsedClasses(classExpression: string) {
+  const usedClasses = new Set<string>();
+
+  for (const className of classExpression.trim().split(/\s+/).filter(Boolean)) {
+    usedClasses.add(className);
+  }
+
+  for (const match of classExpression.matchAll(/["']([^"']+)["']/g)) {
+    for (const className of match[1].trim().split(/\s+/).filter(Boolean)) {
+      usedClasses.add(className);
+    }
+  }
+
+  return usedClasses;
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -57,13 +101,13 @@ export function activate(context: vscode.ExtensionContext) {
     languages,
     {
       provideCompletionItems(document, position) {
-        const classAttributeValue = getClassAttributeValue(document, position);
+        const classExpression = getClassExpression(document, position);
 
-        if (classAttributeValue === undefined) {
+        if (classExpression === undefined) {
           return undefined;
         }
 
-        const usedClasses = getUsedClasses(classAttributeValue);
+        const usedClasses = getUsedClasses(classExpression);
 
         return Object.entries(classMap)
           .filter(([className]) => !usedClasses.has(className))
@@ -74,6 +118,7 @@ export function activate(context: vscode.ExtensionContext) {
             );
 
             item.detail = info.description;
+            item.sortText = `!${className}`;
             item.documentation = new vscode.MarkdownString(
               ["```css", `.${className} {`, `  ${info.css}`, `}`, "```"].join(
                 "\n",
