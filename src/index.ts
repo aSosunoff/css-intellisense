@@ -5,7 +5,7 @@ import { loadClasses } from "./load-classes";
 import { classRegistry } from "./class-registry";
 
 export function activate(context: vscode.ExtensionContext) {
-  loadClasses();
+  loadClasses(context);
 
   const completionProvider = vscode.languages.registerCompletionItemProvider(
     LANGUAGES,
@@ -87,7 +87,7 @@ export function activate(context: vscode.ExtensionContext) {
   const configChangeProvider = vscode.workspace.onDidChangeConfiguration(
     (event) => {
       if (event.affectsConfiguration("cssIntellisense")) {
-        loadClasses();
+        loadClasses(context);
       }
     },
   );

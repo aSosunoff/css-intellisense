@@ -6,7 +6,6 @@ The extension suggests classes inside `class`, `className`, `:class`, and `v-bin
 
 ## Requirements
 
-- Visual Studio Code `1.90.0` or newer.
 - Node.js and npm for local development and packaging.
 - A class map JSON file in the workspace, or the bundled fallback classes from `src/classes.json`.
 

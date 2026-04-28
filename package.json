@@ -3,7 +3,7 @@
   "publisher": "asosunoff",
   "icon": "assets/icon.png",
   "displayName": "CSS IntelliSense",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "engines": {
     "vscode": "^1.116.0"
@@ -40,7 +40,8 @@
     "compile": "tsc -p .",
     "pack": "npm run compile && vsce package",
     "publish": "vsce publish",
-    "build": "npx sharp-cli -i icon.svg -o assets/icon.png resize 128 128"
+    "build": "npx sharp-cli -i icon.svg -o assets/icon.png resize 128 128",
+    "next_version": "npm version 1.0.1 --no-git-tag-version"
   },
   "devDependencies": {
     "@types/vscode": "^1.116.0",

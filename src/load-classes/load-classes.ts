@@ -6,7 +6,7 @@ import { readClassMap } from "./read-class-map";
 import { classRegistry } from "../class-registry";
 import bundledClasses from "../classes.json";
 
-export const loadClasses = async () => {
+export const loadClasses = async (context: vscode.ExtensionContext) => {
   const config = getConfig();
   const classesFilePath = config.get<string>("classesFilePath", "");
   const classesFileName = config.get<string>("classesFileName", "classes.json");
@@ -30,5 +30,10 @@ export const loadClasses = async () => {
   }
 
   classRegistry.setSourceLabel("");
-  classRegistry.setClassMap(bundledClasses);
+
+  if (context.extensionMode === vscode.ExtensionMode.Development) {
+    classRegistry.setClassMap(bundledClasses);
+  } else {
+    classRegistry.setClassMap({});
+  }
 };
