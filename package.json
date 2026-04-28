@@ -11,8 +11,24 @@
     "onLanguage:javascriptreact",
     "onLanguage:typescriptreact"
   ],
-  "main": "./dist/extension.js",
-  "contributes": {},
+  "main": "./dist/index.js",
+  "contributes": {
+    "configuration": {
+      "title": "CSS IntelliSense",
+      "properties": {
+        "cssIntellisense.classesFileName": {
+          "type": "string",
+          "default": "classes.json",
+          "description": "Default class map file name to search for in the workspace when no explicit path is configured."
+        },
+        "cssIntellisense.classesFilePath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the class map JSON file. Relative paths are resolved from the workspace root. Absolute paths are supported."
+        }
+      }
+    }
+  },
   "scripts": {
     "compile": "tsc -p ."
   },
