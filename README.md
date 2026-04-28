@@ -1,6 +1,14 @@
-# CSS IntelliSense
+<p align="center">
+  <img src="./icon.svg" width="120" />
+</p>
 
+<h1 align="center">CSS IntelliSense</h1>
+
+<p align="center">
 VS Code extension for autocompleting CSS utility classes from a JSON class map.
+</p>
+
+---
 
 The extension suggests classes inside `class`, `className`, `:class`, and `v-bind:class` attributes, shows hover documentation for known classes, and does not suggest classes that are already used in the current class list.
 
