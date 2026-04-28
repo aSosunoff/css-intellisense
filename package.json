@@ -36,7 +36,8 @@
   },
   "scripts": {
     "compile": "tsc -p .",
-    "build": "npm run compile && vsce package"
+    "build": "npm run compile && vsce package",
+    "publish": "vsce publish"
   },
   "dependencies": {
     "@types/vscode": "^1.116.0",
