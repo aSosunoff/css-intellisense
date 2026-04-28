@@ -1,0 +1,23 @@
+{
+  "name": "css-intellisense",
+  "displayName": "CSS IntelliSense",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "activationEvents": [
+    "onLanguage:vue",
+    "onLanguage:html",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescriptreact"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {},
+  "scripts": {
+    "compile": "tsc -p ."
+  },
+  "dependencies": {
+    "@types/vscode": "^1.116.0",
+    "typescript": "^6.0.3"
+  }
+}

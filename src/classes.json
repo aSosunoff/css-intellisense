@@ -1,0 +1,10 @@
+{
+  "bg-white": {
+    "description": "some description for bg-white",
+    "css": "background: white"
+  },
+  "font-size-5": {
+    "description": "",
+    "css": "font-size: 20px;"
+  }
+}
