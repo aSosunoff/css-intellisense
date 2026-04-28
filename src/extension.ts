@@ -8,15 +8,35 @@ type ClassInfo = {
 
 const classMap = classes as Record<string, ClassInfo>;
 
-function isInsideClassAttribute(
+function getClassAttributeValue(
   document: vscode.TextDocument,
   position: vscode.Position,
 ) {
-  const textBeforeCursor = document.getText(
-    new vscode.Range(new vscode.Position(0, 0), position),
-  );
+  const documentText = document.getText();
+  const cursorOffset = document.offsetAt(position);
+  const textBeforeCursor = documentText.slice(0, cursorOffset);
 
-  return /class\s*=\s*["'][^"']*$/.test(textBeforeCursor);
+  const doubleQuoteMatch = textBeforeCursor.match(/class\s*=\s*"([^"]*)$/);
+  const singleQuoteMatch = textBeforeCursor.match(/class\s*=\s*'([^']*)$/);
+  const match = doubleQuoteMatch ?? singleQuoteMatch;
+
+  if (!match) {
+    return undefined;
+  }
+
+  const quote = doubleQuoteMatch ? '"' : "'";
+  const textAfterCursor = documentText.slice(cursorOffset);
+  const closingQuoteIndex = textAfterCursor.indexOf(quote);
+  const valueAfterCursor =
+    closingQuoteIndex === -1
+      ? textAfterCursor
+      : textAfterCursor.slice(0, closingQuoteIndex);
+
+  return `${match[1]}${valueAfterCursor}`;
+}
+
+function getUsedClasses(classAttributeValue: string) {
+  return new Set(classAttributeValue.trim().split(/\s+/).filter(Boolean));
 }
 
 export function activate(context: vscode.ExtensionContext) {
@@ -26,25 +46,31 @@ export function activate(context: vscode.ExtensionContext) {
     languages,
     {
       provideCompletionItems(document, position) {
-        if (!isInsideClassAttribute(document, position)) {
+        const classAttributeValue = getClassAttributeValue(document, position);
+
+        if (classAttributeValue === undefined) {
           return undefined;
         }
 
-        return Object.entries(classMap).map(([className, info]) => {
-          const item = new vscode.CompletionItem(
-            className,
-            vscode.CompletionItemKind.Value,
-          );
+        const usedClasses = getUsedClasses(classAttributeValue);
 
-          item.detail = info.description;
-          item.documentation = new vscode.MarkdownString(
-            ["```css", `.${className} {`, `  ${info.css}`, `}`, "```"].join(
-              "\n",
-            ),
-          );
+        return Object.entries(classMap)
+          .filter(([className]) => !usedClasses.has(className))
+          .map(([className, info]) => {
+            const item = new vscode.CompletionItem(
+              className,
+              vscode.CompletionItemKind.Value,
+            );
 
-          return item;
-        });
+            item.detail = info.description;
+            item.documentation = new vscode.MarkdownString(
+              ["```css", `.${className} {`, `  ${info.css}`, `}`, "```"].join(
+                "\n",
+              ),
+            );
+
+            return item;
+          });
       },
     },
     " ",
