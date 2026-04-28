@@ -3,9 +3,9 @@ import { findLastMatch } from "./find-last-match";
 import { getTextBeforeCursor } from "./get-text-before-cursor";
 import { getTextAfterCursor } from "./get-text-after-cursor";
 
-const doubleQuoteMatcher = /\s+(?::class|v-bind:class)\s*=\s*"\{/g;
+const doubleQuoteMatcher = /\s+(?:className|:class|v-bind:class)\s*=\s*"\{/g;
 
-const singleQuoteMatcher = /\s+(?::class|v-bind:class)\s*=\s*'\{/g;
+const singleQuoteMatcher = /\s+(?:className|:class|v-bind:class)\s*=\s*'\{/g;
 
 export const getClassListFromBraces = (
   document: vscode.TextDocument,

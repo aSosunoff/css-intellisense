@@ -1,22 +1,7 @@
 import * as vscode from "vscode";
 import { CLASS_MAP, LANGUAGES, TRIGGER_CHARACTERS } from "./constants";
 import { getClassList } from "./get-class-list";
-
-function getUsedClasses(classList: string) {
-  const usedClasses = new Set<string>();
-
-  for (const className of classList.trim().split(/\s+/).filter(Boolean)) {
-    usedClasses.add(className);
-  }
-
-  for (const match of classList.matchAll(/["']([^"']+)["']/g)) {
-    for (const className of match[1].trim().split(/\s+/).filter(Boolean)) {
-      usedClasses.add(className);
-    }
-  }
-
-  return usedClasses;
-}
+import { getUsedClasses } from "./get-used-classes";
 
 export function activate(context: vscode.ExtensionContext) {
   const completionProvider = vscode.languages.registerCompletionItemProvider(
