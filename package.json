@@ -41,7 +41,7 @@
     "pack": "npm run compile && vsce package",
     "publish": "vsce publish",
     "build": "npx sharp-cli -i icon.svg -o assets/icon.png resize 128 128",
-    "next_version": "npm version 1.0.1 --no-git-tag-version"
+    "next_version": "npm version 1.0.1 --no-git-tag-version && git add . && git commit -m \"Release 1.0.1\" && git tag v1.0.1"
   },
   "devDependencies": {
     "@types/vscode": "^1.116.0",
