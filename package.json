@@ -1,5 +1,7 @@
 {
   "name": "css-intellisense",
+  "publisher": "asosunoff",
+  "icon": "assets/icon.png",
   "displayName": "CSS IntelliSense",
   "version": "1.0.0",
   "license": "MIT",
@@ -36,10 +38,11 @@
   },
   "scripts": {
     "compile": "tsc -p .",
-    "build": "npm run compile && vsce package",
-    "publish": "vsce publish"
+    "pack": "npm run compile && vsce package",
+    "publish": "vsce publish",
+    "build": "npx sharp-cli -i icon.svg -o assets/icon.png resize 128 128"
   },
-  "dependencies": {
+  "devDependencies": {
     "@types/vscode": "^1.116.0",
     "typescript": "^6.0.3"
   }
