@@ -7,6 +7,15 @@ type ClassInfo = {
 };
 
 const classMap = classes as Record<string, ClassInfo>;
+const languages = ["html", "vue", "javascriptreact", "typescriptreact"];
+const triggerCharacters = [
+  " ",
+  '"',
+  "'",
+  ...Array.from(
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_",
+  ),
+];
 
 function getClassAttributeValue(
   document: vscode.TextDocument,
@@ -16,8 +25,12 @@ function getClassAttributeValue(
   const cursorOffset = document.offsetAt(position);
   const textBeforeCursor = documentText.slice(0, cursorOffset);
 
-  const doubleQuoteMatch = textBeforeCursor.match(/class\s*=\s*"([^"]*)$/);
-  const singleQuoteMatch = textBeforeCursor.match(/class\s*=\s*'([^']*)$/);
+  const doubleQuoteMatch = textBeforeCursor.match(
+    /(?:class|className)\s*=\s*"([^"]*)$/,
+  );
+  const singleQuoteMatch = textBeforeCursor.match(
+    /(?:class|className)\s*=\s*'([^']*)$/,
+  );
   const match = doubleQuoteMatch ?? singleQuoteMatch;
 
   if (!match) {
@@ -40,8 +53,6 @@ function getUsedClasses(classAttributeValue: string) {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-  const languages = ["vue", "html"];
-
   const completionProvider = vscode.languages.registerCompletionItemProvider(
     languages,
     {
@@ -73,9 +84,7 @@ export function activate(context: vscode.ExtensionContext) {
           });
       },
     },
-    " ",
-    '"',
-    "'",
+    ...triggerCharacters,
   );
 
   const hoverProvider = vscode.languages.registerHoverProvider(languages, {
