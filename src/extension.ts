@@ -8,6 +8,17 @@ type ClassInfo = {
 
 const classMap = classes as Record<string, ClassInfo>;
 
+function isInsideClassAttribute(
+  document: vscode.TextDocument,
+  position: vscode.Position,
+) {
+  const textBeforeCursor = document.getText(
+    new vscode.Range(new vscode.Position(0, 0), position),
+  );
+
+  return /class\s*=\s*["'][^"']*$/.test(textBeforeCursor);
+}
+
 export function activate(context: vscode.ExtensionContext) {
   const languages = ["vue", "html"];
 
@@ -15,12 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
     languages,
     {
       provideCompletionItems(document, position) {
-        const line = document
-          .lineAt(position)
-          .text.slice(0, position.character);
-
-        // Подсказываем только внутри class="..."
-        if (!/class=["'][^"']*$/.test(line)) {
+        if (!isInsideClassAttribute(document, position)) {
           return undefined;
         }
 
