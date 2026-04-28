@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./assets/icon.svg" width="120" />
+  <img src="./assets/icon.png" width="120" />
 </p>
 
 <h1 align="center">CSS IntelliSense</h1>
