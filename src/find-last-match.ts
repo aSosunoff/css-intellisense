@@ -1,5 +1,3 @@
-import * as vscode from "vscode";
-
 export const findLastMatch = (text: string, pattern: RegExp) => {
   let lastMatch: RegExpExecArray | undefined;
   let match: RegExpExecArray | null;

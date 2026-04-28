@@ -3,10 +3,10 @@ import { getTextBeforeCursor } from "./get-text-before-cursor";
 import { getTextAfterCursor } from "./get-text-after-cursor";
 
 const doubleQuoteMatcher =
-  /\s+(?:class|:class|v-bind:class|className)\s*=\s*"([^"]*)$/;
+  /\s+(?:class|:class|v-bind:class|className)\s*=\s*"([^"{]*)$/;
 
 const singleQuoteMatcher =
-  /\s+(?:class|:class|v-bind:class|className)\s*=\s*'([^']*)$/;
+  /\s+(?:class|:class|v-bind:class|className)\s*=\s*'([^'{]*)$/;
 
 export const getClassListFromString = (
   document: vscode.TextDocument,
