@@ -1,7 +1,7 @@
 {
   "name": "css-intellisense",
   "displayName": "CSS IntelliSense",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "license": "MIT",
   "engines": {
     "vscode": "^1.90.0"
