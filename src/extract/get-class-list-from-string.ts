@@ -17,7 +17,7 @@ export const getClassListFromString = (
   const doubleQuoteMatch = textBeforeCursor.match(doubleQuoteMatcher);
   const singleQuoteMatch = textBeforeCursor.match(singleQuoteMatcher);
 
-  const match = doubleQuoteMatch ?? singleQuoteMatch;
+  const match = doubleQuoteMatch || singleQuoteMatch;
 
   if (!match) return null;
 

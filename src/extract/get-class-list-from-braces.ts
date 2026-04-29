@@ -1,11 +1,12 @@
 import * as vscode from "vscode";
-import { findLastMatch } from "./find-last-match";
 import { getTextBeforeCursor } from "./get-text-before-cursor";
 import { getTextAfterCursor } from "./get-text-after-cursor";
 
-const doubleQuoteMatcher = /\s+(?:className|:class|v-bind:class)\s*=\s*"\{/g;
+const doubleQuoteMatcher =
+  /\s+(?:className|:class|v-bind:class)\s*=\s*"\{\{?([^"]*)$/;
 
-const singleQuoteMatcher = /\s+(?:className|:class|v-bind:class)\s*=\s*'\{/g;
+const singleQuoteMatcher =
+  /\s+(?:className|:class|v-bind:class)\s*=\s*'\{\{?([^']*)$/;
 
 export const getClassListFromBraces = (
   document: vscode.TextDocument,
@@ -13,32 +14,22 @@ export const getClassListFromBraces = (
 ) => {
   const textBeforeCursor = getTextBeforeCursor(document, position);
 
-  const doubleQuoteMatch = doubleQuoteMatcher.test(textBeforeCursor);
-  const singleQuoteMatch = singleQuoteMatcher.test(textBeforeCursor);
+  const doubleQuoteMatch = textBeforeCursor.match(doubleQuoteMatcher);
+  const singleQuoteMatch = textBeforeCursor.match(singleQuoteMatcher);
 
-  const hasMatch = doubleQuoteMatch ?? singleQuoteMatch;
+  const match = doubleQuoteMatch || singleQuoteMatch;
 
-  if (!hasMatch) return null;
+  if (!match) return null;
 
-  const matcher = doubleQuoteMatch ? doubleQuoteMatcher : singleQuoteMatcher;
+  const valueBeforeCursor = match[1];
 
-  const bindingStartMatch = findLastMatch(textBeforeCursor, matcher);
-
-  if (!bindingStartMatch || bindingStartMatch.index === undefined) return null;
-
-  const expressionStart = bindingStartMatch.index + bindingStartMatch[0].length;
   const textAfterCursor = getTextAfterCursor(document, position);
-  const documentText = document.getText();
-  const cursorOffset = document.offsetAt(position);
-  const expressionBeforeCursor = documentText.slice(
-    expressionStart,
-    cursorOffset,
-  );
   const closingBraceIndex = textAfterCursor.indexOf("}");
-  const expressionAfterCursor =
+
+  const valueAfterCursor =
     closingBraceIndex === -1
       ? textAfterCursor
       : textAfterCursor.slice(0, closingBraceIndex);
 
-  return `${expressionBeforeCursor}${expressionAfterCursor}`;
+  return `${valueBeforeCursor}${valueAfterCursor}`;
 };
