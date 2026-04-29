@@ -1,11 +1,29 @@
 import * as vscode from "vscode";
 import { LANGUAGES, TRIGGER_CHARACTERS } from "./constants";
 import { getClassList, getUsedClasses } from "./extract";
-import { loadClasses } from "./load-classes";
-import { classRegistry } from "./class-registry";
+import { ClassInfo, loadClasses } from "./load-classes";
+import bundledClasses from "./classes.json";
 
 export function activate(context: vscode.ExtensionContext) {
-  loadClasses(context);
+  let classMap: Record<string, ClassInfo>;
+  let sourceLabel: string = "";
+
+  const runLoadingClasses = async () => {
+    const registry = await loadClasses();
+
+    sourceLabel = registry.sourceLabel;
+
+    if (registry.classMap) {
+      classMap = registry.classMap;
+    } else {
+      classMap =
+        context.extensionMode === vscode.ExtensionMode.Development
+          ? bundledClasses
+          : {};
+    }
+  };
+
+  runLoadingClasses();
 
   const completionProvider = vscode.languages.registerCompletionItemProvider(
     LANGUAGES,
@@ -16,8 +34,6 @@ export function activate(context: vscode.ExtensionContext) {
         if (!classList) return undefined;
 
         const usedClasses = getUsedClasses(classList);
-
-        const { classMap, sourceLabel } = classRegistry.getSnapshot();
 
         return Object.entries(classMap)
           .filter(([className]) => !usedClasses.has(className))
@@ -55,7 +71,6 @@ export function activate(context: vscode.ExtensionContext) {
         return undefined;
       }
 
-      const { classMap, sourceLabel } = classRegistry.getSnapshot();
       const className = document.getText(range);
       const info = classMap[className];
 
@@ -87,7 +102,7 @@ export function activate(context: vscode.ExtensionContext) {
   const configChangeProvider = vscode.workspace.onDidChangeConfiguration(
     (event) => {
       if (event.affectsConfiguration("cssIntellisense")) {
-        loadClasses(context);
+        runLoadingClasses();
       }
     },
   );
