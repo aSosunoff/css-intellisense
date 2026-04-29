@@ -10,12 +10,13 @@ VS Code extension for autocompleting CSS utility classes from a JSON class map.
 
 ---
 
-The extension suggests classes inside `class`, `className`, `:class`, and `v-bind:class` attributes, shows hover documentation for known classes, and does not suggest classes that are already used in the current class list.
+The extension suggests classes inside `class`, `className`, `:class`, and `v-bind:class` attributes, shows hover documentation for known classes, and hides classes that are already used in the current class list.
 
 ## Requirements
 
 - Node.js and npm for local development and packaging.
-- A class map JSON file in the workspace, or the bundled fallback classes from `src/classes.json`.
+- A class map JSON file in the workspace.
+- In the Extension Development Host, the extension can fall back to bundled classes from `src/classes.json` when no class map is found.
 
 ## Supported Files
 
@@ -36,8 +37,9 @@ Supported attribute examples:
 
 ```tsx
 <div className="bg-white font-size-5" />
-<div className={{ "bg-white": isActive }} />
 ```
+
+JSX expression object syntax such as `className={{ "bg-white": isActive }}` is not supported. Use a string value for `className`.
 
 ## Class Map Format
 
@@ -67,7 +69,9 @@ The extension can load classes in three ways:
 
 1. If `cssIntellisense.classesFilePath` is set, it loads that file.
 2. Otherwise it searches the workspace for a file named by `cssIntellisense.classesFileName`.
-3. If no file is found or the file cannot be read, it uses bundled classes from `src/classes.json`.
+3. In the Extension Development Host only, if no file is found or the file cannot be read, it uses bundled classes from `src/classes.json`.
+
+In a packaged or installed extension, no completions are shown until a readable class map file is available.
 
 Settings:
 
@@ -78,7 +82,8 @@ Settings:
 }
 ```
 
-`cssIntellisense.classesFilePath` can be relative to the workspace root or absolute.
+`cssIntellisense.classesFilePath` can be relative to the first workspace root or an absolute POSIX-style path.
+If `classesFilePath` is empty, `classesFileName` is searched recursively and the first match is used. The search skips `node_modules`, `dist`, and `.git`.
 
 Example with a custom file:
 
@@ -127,5 +132,7 @@ Then package the extension:
 ```sh
 vsce package
 ```
+
+The repository also includes `npm run pack`, which compiles, rebuilds `assets/icon.png`, and runs `vsce package`. That script requires `sharp-cli` to be available through `npx`.
 
 Install the generated `.vsix` file in VS Code through `Extensions: Install from VSIX...`.
