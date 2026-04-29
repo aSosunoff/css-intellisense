@@ -2,11 +2,11 @@ import * as vscode from "vscode";
 import { getTextBeforeCursor } from "./get-text-before-cursor";
 import { getTextAfterCursor } from "./get-text-after-cursor";
 
-const doubleQuoteMatcher =
-  /\s+(?:className|:class|v-bind:class)\s*=\s*"\{\{?([^"]*)$/;
+const doubleQuoteMatcher = /\s+(?::class|v-bind:class)\s*=\s*"\{([^}]*)$/;
 
-const singleQuoteMatcher =
-  /\s+(?:className|:class|v-bind:class)\s*=\s*'\{\{?([^']*)$/;
+const singleQuoteMatcher = /\s+(?::class|v-bind:class)\s*=\s*'\{([^}]*)$/;
+
+const jsxObjectExpressionMatcher = /\s+className\s*=\s*\{\{([^}]*)$/;
 
 export const getClassListFromBraces = (
   document: vscode.TextDocument,
@@ -16,8 +16,12 @@ export const getClassListFromBraces = (
 
   const doubleQuoteMatch = textBeforeCursor.match(doubleQuoteMatcher);
   const singleQuoteMatch = textBeforeCursor.match(singleQuoteMatcher);
+  const jsxObjectExpressionMatch = textBeforeCursor.match(
+    jsxObjectExpressionMatcher,
+  );
 
-  const match = doubleQuoteMatch || singleQuoteMatch;
+  const match =
+    doubleQuoteMatch || singleQuoteMatch || jsxObjectExpressionMatch;
 
   if (!match) return null;
 

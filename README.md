@@ -10,13 +10,13 @@ VS Code extension for autocompleting CSS utility classes from a JSON class map.
 
 ---
 
-The extension suggests classes inside `class`, `className`, `:class`, and `v-bind:class` attributes, shows hover documentation for known classes, and hides classes that are already used in the current class list.
+The extension suggests classes inside `class`, `className`, `:class`, and `v-bind:class` attributes. It also shows hover documentation for known classes and hides classes that are already used in the current class list.
 
 ## Requirements
 
 - Node.js and npm for local development and packaging.
-- A class map JSON file in the workspace.
-- In the Extension Development Host, the extension can fall back to bundled classes from `src/classes.json` when no class map is found.
+- A class map JSON file in the workspace, unless you are running the Extension Development Host fallback.
+- In the Extension Development Host, the extension falls back to bundled classes from `src/classes.json` when no class map is found.
 
 ## Supported Files
 
@@ -37,13 +37,14 @@ Supported attribute examples:
 
 ```tsx
 <div className="bg-white font-size-5" />
+<div className={{ "bg-white": isActive }} />
 ```
 
-JSX expression object syntax such as `className={{ "bg-white": isActive }}` is not supported. Use a string value for `className`.
+Object-style class bindings are supported in quoted Vue attributes and JSX `className={{ ... }}` expressions.
 
 ## Class Map Format
 
-Create a JSON file with class names as keys. Each class must contain:
+Create a JSON file with class names as keys. Each value should contain:
 
 - `description`: text shown in completion and hover documentation.
 - `css`: CSS declaration shown in the documentation block.
@@ -133,6 +134,6 @@ Then package the extension:
 vsce package
 ```
 
-The repository also includes `npm run pack`, which compiles, rebuilds `assets/icon.png`, and runs `vsce package`. That script requires `sharp-cli` to be available through `npx`.
+The repository also includes `npm run pack`, which compiles, rebuilds `assets/icon.png`, and runs `vsce package`. That script requires `vsce` to be available on your `PATH` and uses `npx sharp-cli` to rebuild the icon.
 
 Install the generated `.vsix` file in VS Code through `Extensions: Install from VSIX...`.
