@@ -68,8 +68,8 @@ Example `classes.json`:
 
 The extension can load classes in three ways:
 
-1. If `cssIntellisense.classesFilePath` is set, it loads that file.
-2. Otherwise it searches the workspace for a file named by `cssIntellisense.classesFileName`.
+1. If `cssIntellisense.classesFilePath` contains paths, it loads those files.
+2. It also searches the workspace for a file named by `cssIntellisense.classesFileName`.
 3. In the Extension Development Host only, if no file is found or the file cannot be read, it uses bundled classes from `src/classes.json`.
 
 In a packaged or installed extension, no completions are shown until a readable class map file is available.
@@ -79,18 +79,30 @@ Settings:
 ```json
 {
   "cssIntellisense.classesFileName": "classes.json",
-  "cssIntellisense.classesFilePath": ""
+  "cssIntellisense.classesFilePath": []
 }
 ```
 
-`cssIntellisense.classesFilePath` can be relative to the first workspace root or an absolute POSIX-style path.
-If `classesFilePath` is empty, `classesFileName` is searched recursively and the first match is used. The search skips `node_modules`, `dist`, and `.git`.
+`cssIntellisense.classesFilePath` is an array of paths. Paths can be relative to the first workspace root or absolute POSIX-style paths.
+Class maps are merged in load order, so later files override classes with the same name from earlier files.
+Files from `classesFilePath` are loaded in array order, then the first file matching `classesFileName` is loaded if it exists. The search skips `node_modules`, `dist`, and `.git`.
 
 Example with a custom file:
 
 ```json
 {
-  "cssIntellisense.classesFilePath": "config/css-classes.json"
+  "cssIntellisense.classesFilePath": ["config/css-classes.json"]
+}
+```
+
+Example with multiple custom files:
+
+```json
+{
+  "cssIntellisense.classesFilePath": [
+    "config/base-classes.json",
+    "config/project-classes.json"
+  ]
 }
 ```
 

@@ -3,7 +3,7 @@
   "publisher": "asosunoff",
   "icon": "assets/icon.png",
   "displayName": "CSS IntelliSense",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "MIT",
   "engines": {
     "vscode": "^1.116.0"
@@ -25,9 +25,12 @@
           "description": "Default class map file name to search for in the workspace when no explicit path is configured."
         },
         "cssIntellisense.classesFilePath": {
-          "type": "string",
-          "default": "",
-          "description": "Path to the class map JSON file. Relative paths are resolved from the workspace root. Absolute paths are supported."
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Paths to class map JSON files. Relative paths are resolved from the workspace root. Absolute paths are supported. Maps are merged in order."
         }
       }
     }
@@ -41,7 +44,7 @@
     "pack": "npm run compile && npm run build && vsce package",
     "publish": "vsce publish",
     "build": "npx sharp-cli -i icon.svg -o assets/icon.png resize 128 128",
-    "next_version": "npm version 1.0.2 --no-git-tag-version && git add . && git commit -m \"Release 1.0.2\" && git tag v1.0.2"
+    "next_version": "npm version 1.0.3 --no-git-tag-version && git add . && git commit -m \"Release 1.0.3\" && git tag v1.0.3"
   },
   "devDependencies": {
     "@types/vscode": "^1.116.0",
