@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { getTextBeforeCursor } from "./get-text-before-cursor";
 import { getTextAfterCursor } from "./get-text-after-cursor";
+import { TextType } from "./TextType";
 
 const doubleQuoteMatcher =
   /\s+(?:class|:class|v-bind:class|className)\s*=\s*"([^"{]*)$/;
@@ -8,12 +9,10 @@ const doubleQuoteMatcher =
 const singleQuoteMatcher =
   /\s+(?:class|:class|v-bind:class|className)\s*=\s*'([^'{]*)$/;
 
-export const getClassListFromString = (
-  document: vscode.TextDocument,
-  position: vscode.Position,
-) => {
-  const textBeforeCursor = getTextBeforeCursor(document, position);
-
+export const getClassListFromString = ({
+  textAfterCursor,
+  textBeforeCursor,
+}: TextType) => {
   const doubleQuoteMatch = textBeforeCursor.match(doubleQuoteMatcher);
   const singleQuoteMatch = textBeforeCursor.match(singleQuoteMatcher);
 
@@ -24,7 +23,6 @@ export const getClassListFromString = (
   const valueBeforeCursor = match[1];
 
   const quote = doubleQuoteMatch ? '"' : "'";
-  const textAfterCursor = getTextAfterCursor(document, position);
   const closingQuoteIndex = textAfterCursor.indexOf(quote);
   const valueAfterCursor =
     closingQuoteIndex === -1
