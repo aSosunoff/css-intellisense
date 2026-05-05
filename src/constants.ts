@@ -8,3 +8,4 @@ export const TRIGGER_CHARACTERS = [
   ),
 ];
 export const CONFIG_NAME = "css-intellisense-config.json";
+export const MAX_CONTEXT_LENGTH = 2000;

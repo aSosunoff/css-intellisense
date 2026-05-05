@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { MAX_CONTEXT_LENGTH } from "./constants";
+import { MAX_CONTEXT_LENGTH } from "../constants";
 
 export const getTextBeforeCursor = (
   document: vscode.TextDocument,
