@@ -28,7 +28,7 @@ export function activate(context: vscode.ExtensionContext) {
       provideCompletionItems(document, position) {
         const classList = getClassList(document, position);
 
-        if (!classList) return undefined;
+        if (classList === null) return undefined;
 
         const usedClasses = getUsedClasses(classList);
 
