@@ -1,25 +1,22 @@
 import * as vscode from "vscode";
-import { LANGUAGES, TRIGGER_CHARACTERS } from "./constants";
+import { CONFIG_NAME, LANGUAGES, TRIGGER_CHARACTERS } from "./constants";
 import { getClassList, getUsedClasses } from "./extract";
 import { ClassInfo, loadClasses } from "./load-classes";
-import bundledClasses from "./classes.json";
+import { getFileName } from "./load-classes/get-file-name";
 
 export function activate(context: vscode.ExtensionContext) {
-  let classMap: Record<string, ClassInfo>;
+  let classMap: Record<string, ClassInfo> = {};
   let sourceLabel: string = "";
 
   const runLoadingClasses = async () => {
     const registry = await loadClasses();
 
-    sourceLabel = registry.sourceLabel;
-
-    if (registry.classMap) {
+    if (registry) {
+      sourceLabel = registry.sourceLabel;
       classMap = registry.classMap;
     } else {
-      classMap =
-        context.extensionMode === vscode.ExtensionMode.Development
-          ? bundledClasses
-          : {};
+      sourceLabel = "";
+      classMap = {};
     }
   };
 
@@ -107,10 +104,19 @@ export function activate(context: vscode.ExtensionContext) {
     },
   );
 
+  const configSaveTextDocumentProvider = vscode.workspace.onDidSaveTextDocument(
+    (event) => {
+      if (getFileName(event.fileName) === CONFIG_NAME) {
+        runLoadingClasses();
+      }
+    },
+  );
+
   context.subscriptions.push(
     completionProvider,
     hoverProvider,
     configChangeProvider,
+    configSaveTextDocumentProvider,
   );
 }
 

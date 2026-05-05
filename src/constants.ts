@@ -7,3 +7,4 @@ export const TRIGGER_CHARACTERS = [
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_",
   ),
 ];
+export const CONFIG_NAME = "css-intellisense-config.json";
