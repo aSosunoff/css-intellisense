@@ -16,7 +16,8 @@ export const getClassList = (
     textAfterCursor,
   });
 
-  if (classListFromString) return classListFromString;
+  if (classListFromString || classListFromString === "")
+    return classListFromString;
 
   const classListFromBraces = getClassListFromBraces({
     textBeforeCursor,

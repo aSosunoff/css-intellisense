@@ -7,3 +7,5 @@ export const TRIGGER_CHARACTERS = [
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_",
   ),
 ];
+export const CONFIG_NAME = "css-intellisense-config.json";
+export const MAX_CONTEXT_LENGTH = 2000;

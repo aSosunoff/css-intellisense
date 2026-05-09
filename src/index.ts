@@ -1,26 +1,17 @@
 import * as vscode from "vscode";
-import { LANGUAGES, TRIGGER_CHARACTERS } from "./constants";
+import { CONFIG_NAME, LANGUAGES, TRIGGER_CHARACTERS } from "./constants";
 import { getClassList, getUsedClasses } from "./extract";
 import { ClassInfo, loadClasses } from "./load-classes";
-import bundledClasses from "./classes.json";
+import { getFileName } from "./load-classes/get-file-name";
+import { WithSourceFileName } from "./load-classes";
 
 export function activate(context: vscode.ExtensionContext) {
-  let classMap: Record<string, ClassInfo>;
-  let sourceLabel: string = "";
+  let classMap: Record<string, WithSourceFileName<ClassInfo>> = {};
 
   const runLoadingClasses = async () => {
-    const registry = await loadClasses();
+    const data = await loadClasses();
 
-    sourceLabel = registry.sourceLabel;
-
-    if (registry.classMap) {
-      classMap = registry.classMap;
-    } else {
-      classMap =
-        context.extensionMode === vscode.ExtensionMode.Development
-          ? bundledClasses
-          : {};
-    }
+    classMap = data ? data : {};
   };
 
   runLoadingClasses();
@@ -31,19 +22,19 @@ export function activate(context: vscode.ExtensionContext) {
       provideCompletionItems(document, position) {
         const classList = getClassList(document, position);
 
-        if (!classList) return undefined;
+        if (classList === null) return undefined;
 
         const usedClasses = getUsedClasses(classList);
 
         return Object.entries(classMap)
           .filter(([className]) => !usedClasses.has(className))
-          .map(([className, { css, description }]) => {
+          .map(([className, { css, description, sourceFileName }]) => {
             const item = new vscode.CompletionItem(
               className,
               vscode.CompletionItemKind.Value,
             );
 
-            item.detail = sourceLabel;
+            item.detail = sourceFileName;
             item.sortText = `!${className}`;
             item.documentation = new vscode.MarkdownString(
               [
@@ -88,8 +79,8 @@ export function activate(context: vscode.ExtensionContext) {
         "```",
       ];
 
-      if (sourceLabel) {
-        markdown.unshift(...[`**.${sourceLabel}**`, ""]);
+      if (info.sourceFileName) {
+        markdown.unshift(...[`**${info.sourceFileName}**`, ""]);
       }
 
       return new vscode.Hover(
@@ -107,10 +98,19 @@ export function activate(context: vscode.ExtensionContext) {
     },
   );
 
+  const configSaveTextDocumentProvider = vscode.workspace.onDidSaveTextDocument(
+    (event) => {
+      if (getFileName(event.fileName) === CONFIG_NAME) {
+        runLoadingClasses();
+      }
+    },
+  );
+
   context.subscriptions.push(
     completionProvider,
     hoverProvider,
     configChangeProvider,
+    configSaveTextDocumentProvider,
   );
 }
 

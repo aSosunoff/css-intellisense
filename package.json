@@ -3,7 +3,7 @@
   "publisher": "asosunoff",
   "icon": "assets/icon.png",
   "displayName": "CSS IntelliSense",
-  "version": "1.0.3",
+  "version": "1.13.0",
   "license": "MIT",
   "engines": {
     "vscode": "^1.116.0"
@@ -15,36 +15,16 @@
     "onLanguage:typescriptreact"
   ],
   "main": "./dist/index.js",
-  "contributes": {
-    "configuration": {
-      "title": "CSS IntelliSense",
-      "properties": {
-        "cssIntellisense.classesFileName": {
-          "type": "string",
-          "default": "classes.json",
-          "description": "Default class map file name to search for in the workspace when no explicit path is configured."
-        },
-        "cssIntellisense.classesFilePath": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": [],
-          "description": "Paths to class map JSON files. Relative paths are resolved from the workspace root. Absolute paths are supported. Maps are merged in order."
-        }
-      }
-    }
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/aSosunoff/css-intellisense.git"
   },
   "scripts": {
     "compile": "tsc -p .",
-    "pack": "npm run compile && npm run build && vsce package",
+    "pack": "npm run compile && vsce package",
     "publish": "vsce publish",
-    "build": "npx sharp-cli -i icon.svg -o assets/icon.png resize 128 128",
-    "next_version": "npm version 1.0.3 --no-git-tag-version && git add . && git commit -m \"Release 1.0.3\" && git tag v1.0.3"
+    "buil_assets": "npx sharp-cli -i icon.svg -o assets/icon.png resize 128 128",
+    "release": "node release.mjs"
   },
   "devDependencies": {
     "@types/vscode": "^1.116.0",
