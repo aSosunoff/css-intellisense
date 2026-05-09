@@ -4,16 +4,16 @@ import { readFileJson } from "./read-class-map";
 import { fileExists } from "./file-exists";
 
 export const readConfig = async <T>(configFileName: string) => {
-  const uri = getWorkspaceRelativeUri(configFileName);
+  const workspaceRelativeUri = getWorkspaceRelativeUri(configFileName);
 
-  if (!uri) return;
+  if (!workspaceRelativeUri) return;
 
-  const hasFile = await fileExists(uri);
+  const hasFile = await fileExists(workspaceRelativeUri);
 
   if (!hasFile) return;
 
   try {
-    const content = await readFileJson<T>(uri);
+    const content = await readFileJson<T>(workspaceRelativeUri);
 
     return content;
   } catch {

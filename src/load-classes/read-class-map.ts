@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { ClassInfo } from "./ClassInfo";
 
 export const readFileJson = async <T>(uri: vscode.Uri) => {
   const bytes = await vscode.workspace.fs.readFile(uri);
