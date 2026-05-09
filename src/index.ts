@@ -3,21 +3,15 @@ import { CONFIG_NAME, LANGUAGES, TRIGGER_CHARACTERS } from "./constants";
 import { getClassList, getUsedClasses } from "./extract";
 import { ClassInfo, loadClasses } from "./load-classes";
 import { getFileName } from "./load-classes/get-file-name";
+import { WithSourceFileName } from "./load-classes";
 
 export function activate(context: vscode.ExtensionContext) {
-  let classMap: Record<string, ClassInfo> = {};
-  let sourceLabel: string = "";
+  let classMap: Record<string, WithSourceFileName<ClassInfo>> = {};
 
   const runLoadingClasses = async () => {
-    const registry = await loadClasses();
+    const data = await loadClasses();
 
-    if (registry) {
-      sourceLabel = registry.sourceLabel;
-      classMap = registry.classMap;
-    } else {
-      sourceLabel = "";
-      classMap = {};
-    }
+    classMap = data ? data : {};
   };
 
   runLoadingClasses();
@@ -34,13 +28,13 @@ export function activate(context: vscode.ExtensionContext) {
 
         return Object.entries(classMap)
           .filter(([className]) => !usedClasses.has(className))
-          .map(([className, { css, description }]) => {
+          .map(([className, { css, description, sourceFileName }]) => {
             const item = new vscode.CompletionItem(
               className,
               vscode.CompletionItemKind.Value,
             );
 
-            item.detail = sourceLabel;
+            item.detail = sourceFileName;
             item.sortText = `!${className}`;
             item.documentation = new vscode.MarkdownString(
               [
@@ -85,8 +79,8 @@ export function activate(context: vscode.ExtensionContext) {
         "```",
       ];
 
-      if (sourceLabel) {
-        markdown.unshift(...[`**.${sourceLabel}**`, ""]);
+      if (info.sourceFileName) {
+        markdown.unshift(...[`**.${info.sourceFileName}**`, ""]);
       }
 
       return new vscode.Hover(
