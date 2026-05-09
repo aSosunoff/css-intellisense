@@ -1,7 +1,6 @@
 import * as fs from "node:fs/promises";
 import { fileURLToPath, pathToFileURL } from "url";
 import { execSync } from "node:child_process";
-import { buildNewVersion } from "./version.mjs";
 
 const PACKAGE_JSON_FILE_NAME = "package.json";
 
@@ -36,8 +35,6 @@ const getLastFileVsix = async () => {
 };
 
 const pack = async () => {
-  await buildNewVersion("minor");
-
   execSync(`npm run pack`, { stdio: "inherit" });
   const fileName = await getLastFileVsix();
   execSync(`git add ${fileName}`);
@@ -51,13 +48,6 @@ const pack = async () => {
   execSync(`git commit -m "New version extension ${version}"`, {
     stdio: "inherit",
   });
-
-  // const text = new TextDecoder("utf-8").decode(bytes);
-  // console.log(text);
-
-  // execSync(`npm version ${version} --no-git-tag-version`, { stdio: "inherit" });
-  // execSync("git add package.json package-lock.json");
-  // execSync(`git commit -m "Release ${version}"`, { stdio: "inherit" });
 };
 
 const isCliRun =
@@ -66,49 +56,3 @@ const isCliRun =
 if (isCliRun) {
   pack();
 }
-
-// // import pkg from "./package.json" with { type: "json" };
-// import * as fs from "node:fs/promises";
-// import { fileURLToPath, pathToFileURL } from "url";
-// import path from "path";
-// import { execSync } from "node:child_process";
-
-// const buildNewVersion = async () => {
-//   const newVersion = execSync("npm version minor --no-git-tag-version")
-//     .toString()
-//     .trim();
-
-//   console.log(`Made ${newVersion}`);
-
-//   const version = newVersion.slice(1);
-
-//   execSync("git add .");
-//   execSync(`git commit -m "Release ${version}"`);
-//   execSync(`git tag ${newVersion}`);
-
-//   /* return;
-
-//   const pkg = await readFileJson(`./${PACKAGE_JSON_FILE_NAME}`);
-
-//   if (!pkg) {
-//     console.log(`Do not find the <${PACKAGE_JSON_FILE_NAME}>`);
-//     return;
-//   }
-//   const version = pkg.version;
-//   console.log({ version }); */
-
-//   //   const __filename = fileURLToPath(import.meta.url);
-//   //   const fileName = path.basename(__filename);
-//   //   console.log({
-//   //     __filename,
-//   //     fileName,
-//   //   });
-//   //   console.log(pkg.version);
-// };
-
-// const isCliRun =
-//   process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
-
-// if (isCliRun) {
-//   buildNewVersion();
-// }

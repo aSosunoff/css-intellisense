@@ -1,5 +1,6 @@
 import { fileURLToPath, pathToFileURL } from "url";
 import { execSync } from "node:child_process";
+import * as fs from "node:fs/promises";
 
 const RELEASE_TYPES = new Set(["major", "minor", "patch"]);
 
@@ -54,7 +55,14 @@ const getLatestTagVersion = () => {
   return lastVersion;
 };
 
-export const buildNewVersion = async (releaseType) => {
+const getLastFileVsix = async () => {
+  const files = await fs.readdir(".");
+  const vsixFiles = files.filter((file) => file.endsWith(".vsix"));
+  const fileName = vsixFiles.at(-1);
+  return fileName;
+};
+
+export const release = async (releaseType) => {
   if (!RELEASE_TYPES.has(releaseType)) {
     throw new Error(
       `Unknown release type "${releaseType}". Use major, minor or patch.`,
@@ -65,9 +73,17 @@ export const buildNewVersion = async (releaseType) => {
   const version = formatVersion(bumpVersion(latestVersion, releaseType));
   const tag = `v${version}`;
 
-  execSync(`npm version ${version} --no-git-tag-version`, { stdio: "inherit" });
+  execSync(`npm version ${version} --no-git-tag-version --ignore-scripts`, {
+    stdio: "inherit",
+  });
   execSync("git add package.json package-lock.json");
+
+  execSync(`npm run pack`, { stdio: "inherit" });
+  const fileName = await getLastFileVsix();
+  execSync(`git add ${fileName}`);
+
   execSync(`git commit -m "Release ${version}"`, { stdio: "inherit" });
+
   execSync(`git tag ${tag}`);
 };
 
@@ -77,5 +93,5 @@ const isCliRun =
 if (isCliRun) {
   const releaseType = process.argv[2] ?? "minor";
 
-  buildNewVersion(releaseType);
+  release(releaseType);
 }
