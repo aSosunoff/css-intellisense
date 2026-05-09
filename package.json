@@ -24,7 +24,7 @@
     "pack": "npm run compile && vsce package",
     "publish": "vsce publish",
     "buil_assets": "npx sharp-cli -i icon.svg -o assets/icon.png resize 128 128",
-    "release": "node publish.mjs"
+    "release": "node release.mjs"
   },
   "devDependencies": {
     "@types/vscode": "^1.116.0",
