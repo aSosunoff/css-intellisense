@@ -80,7 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
       ];
 
       if (info.sourceFileName) {
-        markdown.unshift(...[`**.${info.sourceFileName}**`, ""]);
+        markdown.unshift(...[`**${info.sourceFileName}**`, ""]);
       }
 
       return new vscode.Hover(

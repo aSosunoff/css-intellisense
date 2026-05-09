@@ -15,26 +15,6 @@
     "onLanguage:typescriptreact"
   ],
   "main": "./dist/index.js",
-  "contributes": {
-    "configuration": {
-      "title": "CSS IntelliSense",
-      "properties": {
-        "cssIntellisense.classesFileName": {
-          "type": "string",
-          "default": "classes.json",
-          "description": "Default class map file name to search for in the workspace when no explicit path is configured."
-        },
-        "cssIntellisense.classesFilePath": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "default": [],
-          "description": "Paths to class map JSON files. Relative paths are resolved from the workspace root. Absolute paths are supported. Maps are merged in order."
-        }
-      }
-    }
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/aSosunoff/css-intellisense.git"

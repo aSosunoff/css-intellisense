@@ -15,8 +15,8 @@ The extension suggests classes inside `class`, `className`, `:class`, and `v-bin
 ## Requirements
 
 - Node.js and npm for local development and packaging.
-- A class map JSON file in the workspace, unless you are running the Extension Development Host fallback.
-- In the Extension Development Host, the extension falls back to bundled classes from `src/classes.json` when no class map is found.
+- A `css-intellisense-config.json` file in the workspace root.
+- One or more class map JSON files referenced from `css-intellisense-config.json`.
 
 ## Supported Files
 
@@ -66,32 +66,22 @@ Example `classes.json`:
 
 ## Configuration
 
-The extension can load classes in three ways:
-
-1. If `cssIntellisense.classesFilePath` contains paths, it loads those files.
-2. It also searches the workspace for a file named by `cssIntellisense.classesFileName`.
-3. In the Extension Development Host only, if no file is found or the file cannot be read, it uses bundled classes from `src/classes.json`.
-
-In a packaged or installed extension, no completions are shown until a readable class map file is available.
-
-Settings:
+Create `css-intellisense-config.json` in the workspace root:
 
 ```json
 {
-  "cssIntellisense.classesFileName": "classes.json",
-  "cssIntellisense.classesFilePath": []
+  "classesFilePath": ["classes.json"]
 }
 ```
 
-`cssIntellisense.classesFilePath` is an array of paths. Paths can be relative to the first workspace root or absolute POSIX-style paths.
+`classesFilePath` is an array of paths to class map JSON files. Paths can be relative to the workspace root or absolute POSIX-style paths.
 Class maps are merged in load order, so later files override classes with the same name from earlier files.
-Files from `classesFilePath` are loaded in array order, then the first file matching `classesFileName` is loaded if it exists. The search skips `node_modules`, `dist`, and `.git`.
 
 Example with a custom file:
 
 ```json
 {
-  "cssIntellisense.classesFilePath": ["config/css-classes.json"]
+  "classesFilePath": ["config/css-classes.json"]
 }
 ```
 
@@ -99,7 +89,7 @@ Example with multiple custom files:
 
 ```json
 {
-  "cssIntellisense.classesFilePath": [
+  "classesFilePath": [
     "config/base-classes.json",
     "config/project-classes.json"
   ]
@@ -124,13 +114,13 @@ Open this repository in VS Code, then press `F5` to start an Extension Developme
 
 ## Using The Extension
 
-1. Add `classes.json` to your workspace root, or configure `cssIntellisense.classesFilePath`.
+1. Add `css-intellisense-config.json` to your workspace root and point `classesFilePath` to one or more class map files.
 2. Open a supported file type.
 3. Type inside `class`, `className`, `:class`, or `v-bind:class`.
 4. Use completion suggestions to insert a class.
 5. Hover over a known class to see its description and CSS declaration.
 
-The class map is reloaded automatically when `cssIntellisense` settings change. If you edit the JSON file itself, reload the VS Code window to force the extension to read the updated file.
+The class map is reloaded automatically when `css-intellisense-config.json` is saved. If you edit a referenced class map file, reload the VS Code window to force the extension to read the updated file.
 
 ## Packaging
 
