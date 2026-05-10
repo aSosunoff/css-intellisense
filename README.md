@@ -10,7 +10,7 @@ VS Code extension for autocompleting CSS utility classes from a JSON class map.
 
 ---
 
-The extension suggests classes inside `class`, `className`, `:class`, and `v-bind:class` attributes. It also shows hover documentation for known classes and hides classes that are already used in the current class list.
+The extension suggests classes inside `class`, `className`, `:class`, and `v-bind:class` attributes. It also shows hover documentation for known classes, displays the source class map file for each class, and hides classes that are already used in the current class list.
 
 ## Requirements
 
@@ -75,7 +75,7 @@ Create `css-intellisense-config.json` in the workspace root:
 ```
 
 `classesFilePath` is an array of paths to class map JSON files. Paths can be relative to the workspace root or absolute POSIX-style paths.
-Class maps are merged in load order, so later files override classes with the same name from earlier files.
+Class maps are merged in load order, so later files override classes with the same name from earlier files. When a class comes from a configured file, the file name is shown in completion details and at the top of hover documentation.
 
 Example with a custom file:
 
@@ -119,6 +119,7 @@ Open this repository in VS Code, then press `F5` to start an Extension Developme
 3. Type inside `class`, `className`, `:class`, or `v-bind:class`.
 4. Use completion suggestions to insert a class.
 5. Hover over a known class to see its description and CSS declaration.
+6. Check the completion detail or hover title to see which class map file provided the class.
 
 The class map is reloaded automatically when `css-intellisense-config.json` is saved. If you edit a referenced class map file, reload the VS Code window to force the extension to read the updated file.
 
