@@ -1,14 +1,15 @@
+import * as vscode from "vscode";
 import { findDefaultClassesFile } from "./find-default-classes-file";
 import { getConfig } from "./get-config";
 import { getConfiguredFilesUri } from "./get-configured-files-uri";
 
-export const getClassesFileUris = async () => {
+export const getClassesFileUris = async (workspaceFoldersUri: vscode.Uri) => {
   const config = getConfig();
   const classesFilePath = config.get<string[]>("classesFilePath", []);
   const classesFileName = config.get<string>("classesFileName", "classes.json");
 
   const configuredFileUris = getConfiguredFilesUri(
-    null as any,
+    workspaceFoldersUri,
     classesFilePath,
   );
 
