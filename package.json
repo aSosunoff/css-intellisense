@@ -3,7 +3,7 @@
   "publisher": "asosunoff",
   "icon": "assets/icon.png",
   "displayName": "CSS IntelliSense",
-  "version": "1.13.0",
+  "version": "1.14.0",
   "license": "MIT",
   "engines": {
     "vscode": "^1.116.0"
