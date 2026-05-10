@@ -13,16 +13,19 @@ export const getClasses = async (
 
   if (classesFile.length > 0) {
     const classMapWithSourceFileName = classesFile.map(
-      ({ classMap, classesFileUris }) =>
-        Object.fromEntries(
-          Object.entries(classMap).map(([className, data]) => [
+      ({ classMap, classesFileUris }) => {
+        const classMapEntries = Object.entries(classMap).map(
+          ([className, data]) => [
             className,
             {
               ...data,
               sourceFileName: getFileName(classesFileUris.fsPath),
             } satisfies ClassInfo & { sourceFileName: string },
-          ]),
-        ),
+          ],
+        );
+
+        return Object.fromEntries(classMapEntries);
+      },
     );
 
     const classMap = classMapWithSourceFileName.reduce(
