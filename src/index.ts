@@ -1,17 +1,50 @@
 import * as vscode from "vscode";
 import { CONFIG_NAME, LANGUAGES, TRIGGER_CHARACTERS } from "./constants";
 import { getClassList, getUsedClasses } from "./extract";
-import { ClassInfo, loadClasses } from "./load-classes";
+import { ClassInfo, getClasses } from "./load-classes";
 import { getFileName } from "./load-classes/get-file-name";
 import { WithSourceFileName } from "./load-classes";
 
 export function activate(context: vscode.ExtensionContext) {
-  let classMap: Record<string, WithSourceFileName<ClassInfo>> = {};
+  let workspaceRecord: {
+    [k: string]: Record<string, WithSourceFileName<ClassInfo>> | null;
+  };
+
+  const getClassMap = (documentUri: vscode.Uri) => {
+    const workspaceFolder = vscode.workspace.getWorkspaceFolder(documentUri);
+
+    if (!workspaceFolder) return {};
+
+    const data = workspaceRecord[workspaceFolder.uri.fsPath];
+
+    return data ? data : {};
+  };
 
   const runLoadingClasses = async () => {
-    const data = await loadClasses();
+    const workspaceFolders = vscode.workspace.workspaceFolders;
 
-    classMap = data ? data : {};
+    if (workspaceFolders) {
+      const result = await Promise.allSettled(
+        workspaceFolders.map(async ({ uri }) => {
+          const data = await getClasses(uri);
+          const classMap = data ? data : null;
+          return {
+            workspaceFolderPath: uri.path,
+            classMap,
+          };
+        }),
+      );
+
+      const workspaceRecordEntries: Array<
+        [string, Record<string, WithSourceFileName<ClassInfo>> | null]
+      > = result.flatMap((item) =>
+        item.status === "fulfilled"
+          ? [[item.value.workspaceFolderPath, item.value.classMap]]
+          : [],
+      );
+
+      workspaceRecord = Object.fromEntries(workspaceRecordEntries);
+    }
   };
 
   runLoadingClasses();
@@ -25,6 +58,8 @@ export function activate(context: vscode.ExtensionContext) {
         if (classList === null) return undefined;
 
         const usedClasses = getUsedClasses(classList);
+
+        const classMap = getClassMap(document.uri);
 
         return Object.entries(classMap)
           .filter(([className]) => !usedClasses.has(className))
@@ -63,6 +98,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       const className = document.getText(range);
+      const classMap = getClassMap(document.uri);
       const info = classMap[className];
 
       if (!info) {
