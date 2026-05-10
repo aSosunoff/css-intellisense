@@ -1,8 +1,12 @@
-import { getConfiguredFileUri } from "./get-configured-file-uri";
+import * as vscode from "vscode";
+import { getFileUri } from "./get-file-uri";
 
-export const getConfiguredFilesUri = (filePath: string[]) =>
+export const getConfiguredFilesUri = (
+  workspaceUri: vscode.Uri,
+  filePath: string[],
+) =>
   filePath.flatMap((path) => {
-    const uri = getConfiguredFileUri(path);
+    const uri = getFileUri(workspaceUri, path);
 
     return uri ? [uri] : [];
   });

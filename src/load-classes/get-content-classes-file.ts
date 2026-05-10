@@ -4,34 +4,61 @@ import { getConfiguredFilesUri } from "./get-configured-files-uri";
 import { readConfig } from "./read-config";
 import { CONFIG_NAME } from "../constants";
 
-export const getContentClassesFile = async () => {
-  const configContent = await readConfig<{
-    classesFilePath?: string[];
-  }>(CONFIG_NAME);
+type ContentFromConfigFile = {
+  classesFilePath?: string[];
+};
 
-  if (!configContent || typeof configContent !== "object") return;
+export const getContentClassesFile = async (
+  workspaceFoldersUri: vscode.Uri,
+) => {
+  const configRelativeUri = vscode.Uri.joinPath(
+    workspaceFoldersUri,
+    CONFIG_NAME,
+  );
 
-  if (!("classesFilePath" in configContent)) {
-    vscode.window.showWarningMessage(
-      "CSS IntelliSense: config is missing classesFilePath",
+  try {
+    const config = await readConfig<ContentFromConfigFile>(configRelativeUri);
+
+    if (!config) return;
+
+    if (!config || typeof config !== "object") return;
+
+    if (!("classesFilePath" in config)) {
+      vscode.window.showWarningMessage(
+        "CSS IntelliSense: config is missing classesFilePath",
+      );
+      return;
+    }
+
+    if (!Array.isArray(config.classesFilePath)) {
+      vscode.window.showWarningMessage(
+        "CSS IntelliSense: classesFilePath must be an array",
+      );
+      return;
+    }
+
+    const { classesFilePath } = config;
+
+    const configuredFileUris = getConfiguredFilesUri(
+      workspaceFoldersUri,
+      classesFilePath,
     );
-    return;
-  }
 
-  if (!Array.isArray(configContent.classesFilePath)) {
-    vscode.window.showWarningMessage(
-      "CSS IntelliSense: classesFilePath must be an array",
-    );
-    return;
-  }
+    if (configuredFileUris.length > 0) {
+      const classesFile = await readClassesFile(configuredFileUris);
 
-  const { classesFilePath } = configContent;
+      const { loadedClassMaps, failedUris } = classesFile;
 
-  const configuredFileUris = getConfiguredFilesUri(classesFilePath);
+      if (failedUris.length > 0) {
+        vscode.window.showWarningMessage(
+          `CSS IntelliSense: failed to read ${failedUris
+            .map((uri) => uri.fsPath)
+            .join(", ")}.`,
+        );
+      }
 
-  if (configuredFileUris.length > 0) {
-    const classesFile = await readClassesFile(configuredFileUris);
-
-    return classesFile;
+      return loadedClassMaps;
+    }
+  } finally {
   }
 };

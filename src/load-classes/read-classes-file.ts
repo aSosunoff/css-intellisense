@@ -9,9 +9,10 @@ export const readClassesFile = async (classesFileUris: vscode.Uri[]) => {
 
   const loadedClassMaps = results.flatMap((result, index) =>
     result.status === "fulfilled"
-      ? [{ uri: classesFileUris[index], classMap: result.value }]
+      ? [{ classesFileUris: classesFileUris[index], classMap: result.value }]
       : [],
   );
+
   const failedUris = results.flatMap((result, index) =>
     result.status === "rejected" ? [classesFileUris[index]] : [],
   );

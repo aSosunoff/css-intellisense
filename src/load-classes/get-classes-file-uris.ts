@@ -7,7 +7,10 @@ export const getClassesFileUris = async () => {
   const classesFilePath = config.get<string[]>("classesFilePath", []);
   const classesFileName = config.get<string>("classesFileName", "classes.json");
 
-  const configuredFileUris = getConfiguredFilesUri(classesFilePath);
+  const configuredFileUris = getConfiguredFilesUri(
+    null as any,
+    classesFilePath,
+  );
 
   const defaultFileUri = await findDefaultClassesFile(classesFileName);
 
